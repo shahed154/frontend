@@ -1,0 +1,27 @@
+:root {
+
+  --bg-main: #1a1a1a;
+  --bg-second: #282828;
+  --bg-third: #373636;
+
+  --accent: #204ec1;
+  --accent2: #605e5e;
+  
+
+  --text: #f8f8f8;
+  --text2: #c2c2c2;
+  
+
+  --success: #669966;
+  --failed: #dd5555;
+  
+
+  --gap-s: 8px;
+  --gap-m: 14px;
+  --gap-l: 32px;
+  
+  --text-s: 0.75rem;
+  --text-m: 1rem;
+  --text-l: 1.5rem;
+  --text-xl: 2rem;
+}

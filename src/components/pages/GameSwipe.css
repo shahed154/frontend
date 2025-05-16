@@ -1,0 +1,32 @@
+.swipe-title {
+  text-align: center;
+  font-size: var(--text-xl);
+}
+
+.swipe-subtitle {
+  text-align: center;
+  font-size: var(--text-m);
+  color: var(--text2);
+  margin: 0 auto;
+}
+
+.swipe-area {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: var(--gap-m);
+  min-height: 650px;
+}
+
+.swipe-actions {
+  display: flex;
+  justify-content: center;
+  gap: var(--gap-l);
+  margin: var(--gap-l);
+}
+
+.swipe-button {
+  width: 50px;
+  height: 50px;
+  background-color: var(--accent2);
+  font-size: 24px;
+}

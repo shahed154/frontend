@@ -1,0 +1,25 @@
+.navbar {
+  background-color: var(--bg-second);
+  padding: var(--gap-m);
+  border-bottom: 2px solid var(--accent);
+}
+
+.navbar-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.navbar-logo {
+  font-size: var(--text-xl);
+  color: var(--accent);
+}
+
+.navbar-menu {
+  display: flex;
+  align-items: center;
+}
+
+.navbar-item {
+  padding: var(--gap-m);
+  color: var(--text);
+}

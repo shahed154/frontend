@@ -1,0 +1,99 @@
+@import './variables.css';
+
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+font-family: "Arial";
+  background-color: var(--bg-main);
+  color: var(--text);
+}
+
+
+a {
+  text-decoration: none;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+.container {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 10px;
+}
+
+
+.btn {
+  padding: 10px;
+  font-family: inherit;
+}
+
+.btn-primary {
+  background-color: var(--accent);
+  color: var(--text);
+}
+
+.btn-secondary {
+  background-color: var(--bg-third);
+  color: var(--text);
+}
+
+
+.form-input {
+  width: 100%;
+  padding: 10px;
+  background-color: var(--bg-third);
+}
+
+
+
+
+.games-grid {
+  display: grid;
+  gap: var(--gap-m);
+  margin: var(--gap-m) ;
+}
+/*  show grids of 2 .  */
+@media (min-width: 768px) {
+  .games-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+
+.alert-error {
+  background-color: var(--bg-second);
+  border-color: var(--failed);
+  color: var(--failed);
+}
+
+.alert-success {
+  background-color: var(--bg-second);
+  border-color: var(--success);
+  color: var(--success);
+}
+
+
+.account-form {
+  max-width: 500px;
+  margin: 0 auto;
+  background-color: var(--bg-second);
+  padding: var(--gap-l);
+  border: 3px solid var(--accent);
+}
+
+.account-title {
+
+  text-align: center;
+  margin-bottom: var(--gap-l);
+  font-size: var(--text-l);
+}

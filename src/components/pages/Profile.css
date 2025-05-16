@@ -1,0 +1,17 @@
+.profile-container {
+  padding: var(--gap-l);
+}
+
+.profile-header {
+  margin-bottom: var(--gap-l);
+}
+
+.profile-info {
+  background-color: var(--bg-second);
+  padding: var(--gap-m);
+  max-width: 400px;
+}
+
+.username {
+  font-size: var(--text-l);
+}

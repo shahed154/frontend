@@ -1,0 +1,8 @@
+.main-section {
+  text-align: center;
+  margin: var(--gap-l);
+}
+
+.main-subtitle {
+  color: var(--text2);
+}
