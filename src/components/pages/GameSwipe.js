@@ -1,55 +1,76 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useState, useContext } from 'react';
 import { gameService } from '../../services/api';
 import { UserContext } from "../../context/UserContext";
-import GameCard from '../ui/GameCard'
+import GameCard from '../ui/GameCard';
 import './GameSwipe.css';
 
-const GameSwipe = () =>
-   {
+const GameSwipe = () => {
   const [currentGame, setCurrentGame] = useState(null);
   const [nextGames, setNextGames] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const [page, setPage] = useState(1);
-  const [error, setError] = useState("")
+  const [initialized, setInitialized] = useState(false);
   const { currentUser, isAuthenticated } = useContext(UserContext);
 
-  //////// INITIAL GAME LOAD /////////
-
-useEffect(() => {
-  const fetchGames = async () => {
+  const initializeGames = async () => {
+    if (initialized) return;
+    
     try {
-      console.log("Getting games, page", page)
-      setLoading(true)
-      setError("")
+      setLoading(true);
+      setError("");
       
       const gamesData = await gameService.getTrendingGames(page);
-
-      console.log("Games data:", gamesData)
       
       if (gamesData && gamesData.length > 0) {
         setCurrentGame(gamesData[0]);
         setNextGames(gamesData.slice(1));
       } else {
-        setError("No game available")
+        setError("No game available");
       }
+      
+      setInitialized(true);
     } catch (error) {
-      console.error('Error getting games:', error)
+      console.error('Error getting games:', error);
       setError("Failed to load games.");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-  fetchGames();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-}, [])
+  const loadMoreGames = async () => {
+    try {
+      const nextPage = page + 1;
+      setPage(nextPage);
+      
+      const moreGames = await gameService.getTrendingGames(nextPage);
+      
+      if (moreGames && moreGames.length > 0) {
+        setNextGames(prevGames => [...prevGames, ...moreGames]);
+      }
+    } catch (error) {
+      console.error("Error loading more games:", error);
+    }
+  };
 
-  ////// HANDLE GAME PREFERENCES /////
+  const moveToNextGame = () => {
+    if (nextGames.length > 0) {
+      setCurrentGame(nextGames[0]);
+      setNextGames(prevGames => prevGames.slice(1));
+      
+      if (nextGames.length <= 2) {
+        loadMoreGames();
+      }
+    } else {
+      loadMoreGames();
+    }
+  };
+
   const handleLike = async () => {
     if (!isAuthenticated) {
-      alert('Please login to save your preferences')
-      moveToNextGame()
-      return
+      alert('Please login to save your preferences');
+      moveToNextGame();
+      return;
     }
 
     try {
@@ -58,19 +79,19 @@ useEffect(() => {
           currentGame.id, 
           true, 
           currentUser._id
-        )
-        moveToNextGame()
+        );
+        moveToNextGame();
       }
     } catch (error) {
-      console.error("Error saving like:", error)
+      console.error("Error saving like:", error);
     }
-  }
+  };
 
   const handleDislike = async () => {
     if (!isAuthenticated) {
-      alert('Please login to save your preferences')
-      moveToNextGame()
-      return
+      alert('Please login to save your preferences');
+      moveToNextGame();
+      return;
     }
 
     try {
@@ -79,44 +100,16 @@ useEffect(() => {
           currentGame.id, 
           false, 
           currentUser._id
-        )
-        moveToNextGame()
+        );
+        moveToNextGame();
       }
     } catch (error) {
-      console.error("Error saving dislike:", error)
+      console.error("Error saving dislike:", error);
     }
-  }
+  };
 
-  //// MOVE TO NEXT GAME /////
-  const moveToNextGame = () => {
-    if (nextGames.length > 0) {
-      setCurrentGame(nextGames[0])
-      setNextGames(prevGames => prevGames.slice(1))
-      
-    
-      if (nextGames.length <= 2) {
-        loadMoreGames()
-      }
-    } else {
-  
-      loadMoreGames()
-    }
-  }
-  
-  ///// LOAD MORE GAMES /////
-  const loadMoreGames = async () => {
-    try {
-      const nextPage = page + 1
-      setPage(nextPage)
-      
-      const moreGames = await gameService.getTrendingGames(nextPage)
-      
-      if (moreGames && moreGames.length > 0) {
-        setNextGames(prevGames => [...prevGames, ...moreGames])
-      }
-    } catch (error) {
-      console.error("Error loading more games:", error)
-    }
+  if (!initialized && !loading) {
+    initializeGames();
   }
 
   return (
@@ -166,7 +159,7 @@ useEffect(() => {
                 </div>
               ) : (
                 <div className="no-games-message">
-                  <h3>No more gamess to show</h3>
+                  <h3>No more games to show</h3>
                   <p>Come back later for more recommendations!</p>
                 </div>
               )}
@@ -175,7 +168,7 @@ useEffect(() => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default GameSwipe
+export default GameSwipe;
