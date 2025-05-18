@@ -15,7 +15,7 @@ const GameSwipe = () =>
 
   //////// INITIAL GAME LOAD /////////
 
-  useEffect(() => {
+useEffect(() => {
   const fetchGames = async () => {
     try {
       console.log("Getting games, page", page)
@@ -41,7 +41,8 @@ const GameSwipe = () =>
   }
 
   fetchGames();
-}, [page]) 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [])
 
   ////// HANDLE GAME PREFERENCES /////
   const handleLike = async () => {
