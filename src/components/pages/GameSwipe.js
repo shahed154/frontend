@@ -1,9 +1,9 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext } from 'react';//
 import { gameService } from '../../services/api';
 import { UserContext } from "../../context/UserContext";
 import GameCard from '../ui/GameCard';
 import './GameSwipe.css';
-
+///
 const GameSwipe = () => {
   const [currentGame, setCurrentGame] = useState(null);
   const [nextGames, setNextGames] = useState([]);
