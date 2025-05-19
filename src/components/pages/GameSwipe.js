@@ -1,142 +1,123 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react'
 import { gameService } from '../../services/api';
 import { UserContext } from "../../context/UserContext";
-import GameCard from '../ui/GameCard';
+import GameCard from '../ui/GameCard'
 import './GameSwipe.css';
 
 const GameSwipe = () => {
-  const [gameData, setGameData] = useState({
-    currentGame: null,
-    nextGames: [],
-    loading: true,
-    error: "",
-    page: 1
-  });
+  const [currentGame, setCurrentGame] = useState(null);
+  const [nextGames, setNextGames] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [error, setError] = useState("");
   const { currentUser, isAuthenticated } = useContext(UserContext);
-  
- 
+
   useEffect(function loadInitialGames() {
     let isMounted = true;
     
-    async function fetchInitialGames() {
+    async function fetchGames() {
       try {
-        const gamesData = await gameService.getTrendingGames(1);
+        setLoading(true);
+        setError("");
         
-        if (isMounted && gamesData && gamesData.length > 0) {
-          setGameData({
-            currentGame: gamesData[0],
-            nextGames: gamesData.slice(1),
-            loading: false,
-            error: "",
-            page: 1
-          });
-        } else if (isMounted) {
-          setGameData(prev => ({
-            ...prev,
-            loading: false,
-            error: "No game available"
-          }));
+        const gamesData = await gameService.getTrendingGames(page);
+        
+        if (!isMounted) return;
+        
+        if (gamesData && gamesData.length > 0) {
+          setCurrentGame(gamesData[0]);
+          setNextGames(gamesData.slice(1));
+        } else {
+          setError("No game available");
         }
       } catch (error) {
+        if (!isMounted) return;
+        console.error('Error getting games:', error);
+        setError("Failed to load games.");
+      } finally {
         if (isMounted) {
-          console.error('Error getting games:', error);
-          setGameData(prev => ({
-            ...prev,
-            loading: false,
-            error: "Failed to load games."
-          }));
+          setLoading(false);
         }
       }
     }
-    
-    fetchInitialGames();
+
+    fetchGames();
     
     return function cleanup() {
       isMounted = false;
     };
-  }, []); 
+  }, []);
 
+  const handleLike = async () => {
+    if (!isAuthenticated) {
+      alert('Please login to save your preferences');
+      moveToNextGame();
+      return;
+    }
 
-  function loadMoreGames() {
-    const nextPage = gameData.page + 1;
-    
-    gameService.getTrendingGames(nextPage)
-      .then(moreGames => {
-        if (moreGames && moreGames.length > 0) {
-          setGameData(prev => ({
-            ...prev,
-            nextGames: [...prev.nextGames, ...moreGames],
-            page: nextPage
-          }));
-        }
-      })
-      .catch(error => {
-        console.error("Error loading more games:", error);
-      });
-  }
-  
-  function moveToNextGame() {
-    if (gameData.nextGames.length > 0) {
-      setGameData(prev => ({
-        ...prev,
-        currentGame: prev.nextGames[0],
-        nextGames: prev.nextGames.slice(1)
-      }));
+    try {
+      if (currentGame) {
+        await gameService.saveGamePreference(
+          currentGame.id, 
+          true, 
+          currentUser._id
+        );
+        moveToNextGame();
+      }
+    } catch (error) {
+      console.error("Error saving like:", error);
+    }
+  };
+
+  const handleDislike = async () => {
+    if (!isAuthenticated) {
+      alert('Please login to save your preferences');
+      moveToNextGame();
+      return;
+    }
+
+    try {
+      if (currentGame) {
+        await gameService.saveGamePreference(
+          currentGame.id, 
+          false, 
+          currentUser._id
+        );
+        moveToNextGame();
+      }
+    } catch (error) {
+      console.error("Error saving dislike:", error);
+    }
+  };
+
+  const moveToNextGame = () => {
+    if (nextGames.length > 0) {
+      setCurrentGame(nextGames[0]);
+      setNextGames(prevGames => prevGames.slice(1));
       
-      if (gameData.nextGames.length <= 2) {
+      if (nextGames.length <= 2) {
         loadMoreGames();
       }
     } else {
       loadMoreGames();
     }
-  }
-  function handleLike() {
-    if (!isAuthenticated) {
-      alert('Please login to save your preferences');
-      moveToNextGame();
-      return;
-    }
-
-    if (gameData.currentGame) {
-      gameService.saveGamePreference(
-        gameData.currentGame.id, 
-        true, 
-        currentUser._id
-      )
-      .then(() => {
-        moveToNextGame();
-      })
-      .catch(error => {
-        console.error("Error saving like:", error);
-      });
-    }
-  }
+  };
   
-
-  function handleDislike() {
-    if (!isAuthenticated) {
-      alert('Please login to save your preferences');
-      moveToNextGame();
-      return;
+  const loadMoreGames = async () => {
+    try {
+      const nextPage = page + 1;
+      setPage(nextPage);
+      
+      const moreGames = await gameService.getTrendingGames(nextPage);
+      
+      if (moreGames && moreGames.length > 0) {
+        setNextGames(prevGames => [...prevGames, ...moreGames]);
+      }
+    } catch (error) {
+      console.error("Error loading more games:", error);
     }
+  };
 
-    if (gameData.currentGame) {
-      gameService.saveGamePreference(
-        gameData.currentGame.id, 
-        false, 
-        currentUser._id
-      )
-      .then(() => {
-        moveToNextGame();
-      })
-      .catch(error => {
-        console.error("Error saving dislike:", error);
-      });
-    }
-  }
-  
-  const { currentGame, loading, error } = gameData;
-  
   return (
     <div className="game-swipe-container">
       <div className="container">
