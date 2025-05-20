@@ -81,7 +81,7 @@ const Home = () => {
           {loading ? (
             <div className="loading-container">
               <div className="spinner"></div>
-              <p>Loading games...</p>
+              <p>Loading games...be wary on render it takes about 15 seconds or up to a minute to load</p>
             </div>
           ) : error ? (
             <div className="error-container">
